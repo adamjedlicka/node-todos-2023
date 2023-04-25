@@ -1,6 +1,6 @@
 import express from 'express'
 import cookieParser from 'cookie-parser'
-import { createUser, db, getUserByToken } from './database.js'
+import { createUser, db, getUserByPassword, getUserByToken } from './database.js'
 import { sendTodoDeletedToAllConnections, sendTodoToAllConnections, sendTodosToAllConnections } from './websockets.js'
 
 export const app = express()
@@ -32,7 +32,9 @@ const requiresAuth = (req, res, next) => {
 }
 
 app.get('/', async (req, res) => {
-  const query = db('todos').select('*')
+  const query = db('todos')
+    .select('*')
+    .where('user_id', res.locals.user?.id ?? null)
 
   if (req.query.done) {
     query.where('done', req.query.done === 'true')
@@ -49,6 +51,7 @@ app.post('/new-todo', async (req, res) => {
   const newTodo = {
     title: (req.body.title || '').trim(),
     deadline: req.body.deadline || null,
+    user_id: res.locals.user?.id ?? null,
   }
 
   if (!newTodo.title) {
@@ -67,7 +70,10 @@ app.post('/new-todo', async (req, res) => {
 app.get('/remove-todo/:id', async (req, res) => {
   const idToRemove = Number(req.params.id)
 
-  await db('todos').delete().where('id', idToRemove)
+  await db('todos')
+    .delete()
+    .where('id', idToRemove)
+    .where('user_id', res.locals.user?.id ?? null)
 
   sendTodosToAllConnections()
   sendTodoDeletedToAllConnections(idToRemove)
@@ -78,7 +84,11 @@ app.get('/remove-todo/:id', async (req, res) => {
 app.get('/toggle-todo/:id', async (req, res, next) => {
   const idToToggle = Number(req.params.id)
 
-  const todoToToggle = await db('todos').select('*').where('id', idToToggle).first()
+  const todoToToggle = await db('todos')
+    .select('*')
+    .where('id', idToToggle)
+    .where('user_id', res.locals.user?.id ?? null)
+    .first()
 
   if (!todoToToggle) return next()
 
@@ -93,7 +103,11 @@ app.get('/toggle-todo/:id', async (req, res, next) => {
 app.get('/detail-todo/:id', async (req, res, next) => {
   const idToShow = Number(req.params.id)
 
-  const todoToShow = await db('todos').select('*').where('id', idToShow).first()
+  const todoToShow = await db('todos')
+    .select('*')
+    .where('id', idToShow)
+    .where('user_id', res.locals.user?.id ?? null)
+    .first()
 
   if (!todoToShow) return next()
 
@@ -106,7 +120,11 @@ app.post('/update-todo/:id', async (req, res, next) => {
   const idToUpdate = Number(req.params.id)
   const newTitle = String(req.body.title)
 
-  const todoToUpdate = await db('todos').select('*').where('id', idToUpdate).first()
+  const todoToUpdate = await db('todos')
+    .select('*')
+    .where('id', idToUpdate)
+    .where('user_id', res.locals.user?.id ?? null)
+    .first()
 
   if (!todoToUpdate) return next()
 
@@ -126,6 +144,24 @@ app.post('/register', async (req, res) => {
   const user = await createUser(req.body.username, req.body.password)
 
   res.cookie('token', user.token)
+
+  res.redirect('/')
+})
+
+app.get('/login', (req, res) => {
+  res.render('login')
+})
+
+app.post('/login', async (req, res) => {
+  const user = await getUserByPassword(req.body.username, req.body.password)
+
+  res.cookie('token', user.token)
+
+  res.redirect('/')
+})
+
+app.get('/logout', (req, res) => {
+  res.cookie('token', '')
 
   res.redirect('/')
 })

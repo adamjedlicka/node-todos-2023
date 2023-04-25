@@ -7,7 +7,7 @@ test.beforeEach(async () => {
   await db.migrate.latest()
 })
 
-test.afterEach(async () => {
+test.afterEach.always(async () => {
   await db.migrate.rollback()
 })
 
