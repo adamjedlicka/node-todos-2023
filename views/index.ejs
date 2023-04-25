@@ -1,45 +1,38 @@
-<!DOCTYPE html>
-<html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>ToDos!</title>
-  </head>
-  <body>
-    <% if (user) { %>
-      <%= user.username %>
-      <a href="/logout">Odhlásit se</a>
-    <% } else { %>
-      <a href="/login">Přihlásit se</a>
-      <a href="/register">Registrovat se</a>
-    <% } %>
+<%- include('_header', { title: 'ToDos!!!' }) %>
 
-    <hr>
+<% if (user) { %>
+  <%= user.username %>
+  <a href="/logout">Odhlásit se</a>
+<% } else { %>
+  <a href="/login">Přihlásit se</a>
+  <a href="/register">Registrovat se</a>
+<% } %>
 
-    <h1>ToDos!</h1>
+<hr>
 
-    <a href="/">Zobrazit vše</a>
-    <a href="?done=false">Pouze nesplněné</a>
-    <a href="?done=true">Pouze splněné</a>
+<h1>ToDos!</h1>
 
-    <div id="todos"><%- include('_todos') %></div>
+<a href="/">Zobrazit vše</a>
+<a href="?done=false">Pouze nesplněné</a>
+<a href="?done=true">Pouze splněné</a>
 
-    <form method="post" action="/new-todo">
-      <input type="text" name="title">
-      <input type="date" name="deadline" >
-      <button type="submit">Přidat TODO</button>
-    </form>
+<div id="todos"><%- include('_todos') %></div>
 
-    <script>
-      const ws = new WebSocket('ws://localhost:3000')
+<form method="post" action="/new-todo">
+  <input type="text" name="title">
+  <input type="date" name="deadline" >
+  <button type="submit">Přidat TODO</button>
+</form>
 
-      ws.addEventListener('message', (ev) => {
-        const message = JSON.parse(ev.data)
-        if (message.type === 'todos') {
-          document.getElementById('todos').innerHTML = message.html
-        }
-      })
-    </script>
-  </body>
-</html>
+<script>
+  const ws = new WebSocket('ws://localhost:3000')
+
+  ws.addEventListener('message', (ev) => {
+    const message = JSON.parse(ev.data)
+    if (message.type === 'todos') {
+      document.getElementById('todos').innerHTML = message.html
+    }
+  })
+</script>
+
+<%- include('_footer') %>

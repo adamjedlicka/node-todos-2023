@@ -1,35 +1,28 @@
-<!DOCTYPE html>
-<html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title><%= todo.title %></title>
-  </head>
-  <body>
-    <div id="todo"><%- include('_todo') %></div>
+<%- include('_header', { title: todo.title }) %>
 
-    <form method="post" action="/update-todo/<%= todo.id %>">
-      <h2>Upravit</h2>
-      <input type="text" name="title" placeholder="Název">
-      <button type="submit">Uložit</button>
-    </form>
+<div id="todo"><%- include('_todo') %></div>
 
-    <hr>
+<form method="post" action="/update-todo/<%= todo.id %>">
+  <h2>Upravit</h2>
+  <input type="text" name="title" placeholder="Název">
+  <button type="submit">Uložit</button>
+</form>
 
-    <a href="/">Zpět na seznam ToDos</a>
+<hr>
 
-    <script>
-      const ws = new WebSocket('ws://localhost:3000')
+<a href="/">Zpět na seznam ToDos</a>
 
-      ws.addEventListener('message', (ev) => {
-        const message = JSON.parse(ev.data)
-        if (message.type === 'todo' && message.id === Number('<%= todo.id %>')) {
-          document.getElementById('todo').innerHTML = message.html
-        } else if (message.type === 'todo-deleted' && message.id === Number('<%= todo.id %>')) {
-          document.getElementById('todo').innerHTML = '<h1>Todo bylo smazáno</h1>'
-        }
-      })
-    </script>
-  </body>
-</html>
+<script>
+  const ws = new WebSocket('ws://localhost:3000')
+
+  ws.addEventListener('message', (ev) => {
+    const message = JSON.parse(ev.data)
+    if (message.type === 'todo' && message.id === Number('<%= todo.id %>')) {
+      document.getElementById('todo').innerHTML = message.html
+    } else if (message.type === 'todo-deleted' && message.id === Number('<%= todo.id %>')) {
+      document.getElementById('todo').innerHTML = '<h1>Todo bylo smazáno</h1>'
+    }
+  })
+</script>
+
+<%- include('_footer') %>
