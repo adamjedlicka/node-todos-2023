@@ -15,15 +15,19 @@ app.use(cookieParser())
 
 app.use(loadUser)
 
-app.get('/', async (req, res) => {
-  const todos = await getAllTodos({
-    user: res.locals.user,
-    done: req.query.done === 'true',
-  })
+app.get('/', async (req, res, next) => {
+  try {
+    const todos = await getAllTodos({
+      user: res.locals.user,
+      done: req.query.done === 'true',
+    })
 
-  return res.render('index', {
-    todos: todos,
-  })
+    return res.render('index', {
+      todos: todos,
+    })
+  } catch (e) {
+    next(e)
+  }
 })
 
 app.use(todosRouter)

@@ -1,8 +1,11 @@
+import 'dotenv/config.js'
 import { app } from './src/app.js'
 import { createWebSocketServer } from './src/websockets.js'
 
-const server = app.listen(3000, () => {
-  console.log('App listening on port 3000')
+const port = process.env.APP_PORT
+
+const server = app.listen(port, () => {
+  console.log(`App listening on port ${port}`)
 })
 
 createWebSocketServer(server)

@@ -6,6 +6,13 @@ export default {
     },
     useNullAsDefault: false,
   },
+  production: {
+    client: 'sqlite3',
+    connection: {
+      filename: './mydb-prod.sqlite',
+    },
+    useNullAsDefault: false,
+  },
   test: {
     client: 'sqlite3',
     connection: {
