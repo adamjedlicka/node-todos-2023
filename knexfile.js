@@ -7,11 +7,13 @@ export default {
     useNullAsDefault: false,
   },
   production: {
-    client: 'sqlite3',
+    client: 'pg',
     connection: {
-      filename: './mydb-prod.sqlite',
+      host: 'db',
+      user: process.env.DATABASE_USER,
+      password: process.env.DATABASE_PASSWORD,
+      database: 'todos',
     },
-    useNullAsDefault: false,
   },
   test: {
     client: 'sqlite3',

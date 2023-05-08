@@ -9,3 +9,11 @@ const server = app.listen(port, () => {
 })
 
 createWebSocketServer(server)
+
+const close = () => {
+  console.log('Closing application')
+  process.exit()
+}
+
+process.on('SIGINT', close)
+process.on('SIGTERM', close)
