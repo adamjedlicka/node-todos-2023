@@ -1,4 +1,4 @@
-FROM node:18-alpine AS build
+FROM node:18 AS build
 
 WORKDIR /app
 
@@ -8,7 +8,7 @@ RUN npm install --omit=dev
 
 COPY . .
 
-FROM node:18-alpine
+FROM node:18
 
 WORKDIR /app
 
